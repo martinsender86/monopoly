@@ -22,7 +22,7 @@ Sirve, por ejemplo, para preparar el sonido de un grabador para Avid, Premiere o
 
 ## Uso
 
-- **Windows:** doble clic en `MonoPoly.exe` (en Releases). Si aparece "Windows protegió su PC": Más información > Ejecutar de todas formas.
+- **Windows:** doble clic en `MonoPoly.exe` (en la carpeta `descargas/`). Si aparece "Windows protegió su PC": Más información > Ejecutar de todas formas.
 - **Mac:** compilá la app con `Mac/COMPILAR_MAC.command` (necesita Python 3 de python.org). La primera vez, clic derecho > Abrir. Una app compilada en Apple Silicon no corre en Intel, y al revés.
 - Para compilar en Windows: `Windows/COMPILAR_WINDOWS.bat`.
 
@@ -39,6 +39,6 @@ Manual completo en `Windows/LEEME.txt` (es el mismo en Mac).
 
 El código es el mismo en `Windows/` y `Mac/`; cada carpeta tiene su script de compilación.
 
-## Descargas
+## Descargas (listo para usar)
 
-`MonoPoly.exe` (Windows) en **Releases**.
+`MonoPoly.exe` (Windows) en la carpeta **`descargas/`**.
