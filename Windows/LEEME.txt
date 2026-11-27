@@ -1,0 +1,194 @@
+﻿==============================================================================
+  MonoPoly 1.5  —  Unir, separar y editar archivos de sonido de rodaje (WAV / BWF)
+==============================================================================
+
+QUÉ ES
+------
+MonoPoly es una herramienta para post-producción de sonido en cine y video,
+pensada como reemplazo moderno del viejo Wave Agent. Hace tres cosas:
+
+  1. UNIR varios archivos MONO en un solo archivo POLY (multicanal).
+  2. SEPARAR un archivo POLY en sus archivos MONO.
+  3. EDITAR la metadata de rodaje (escena, toma, tape, proyecto, notas,
+     nombres de track, frame rate y TC de inicio), siempre en una copia nueva.
+
+Sirve, por ejemplo, para preparar el sonido de un grabador para Avid, Premiere
+o Resolve, recuperar polys cuando el grabador entregó monos sueltos, o
+completar la metadata de grabadores que no la escriben (como los Zoom).
+
+Su regla principal es que el audio nunca se toca. Las muestras se copian byte
+a byte: no cambian el sample rate, la profundidad de bits, la duración ni el
+timecode. Si unís y después separás, obtenés archivos idénticos a los originales.
+
+
+------------------------------------------------------------------------------
+SI TE PASARON LA APP YA COMPILADA
+------------------------------------------------------------------------------
+No hace falta instalar nada.
+
+  WINDOWS:  doble clic en MonoPoly.exe.
+            Si aparece "Windows protegió su PC": "Más información" >
+            "Ejecutar de todas formas" (la app no está firmada digitalmente).
+
+  MAC:      la primera vez, clic derecho en MonoPoly.app > Abrir > Abrir.
+            Si no aparece esa opción: Ajustes del Sistema > Privacidad y
+            seguridad > bajar hasta MonoPoly > "Abrir igualmente".
+            Las veces siguientes abre con doble clic.
+            Ojo: una app compilada en una Mac con Apple Silicon (M1, M2...)
+            no corre en una Mac Intel, y al revés.
+
+
+------------------------------------------------------------------------------
+COMPILAR LA APP (solo una vez, en tu compu)
+------------------------------------------------------------------------------
+El kit trae el código y un script que arma la app. Necesitás Python 3 de
+python.org. No hace falta saber programar.
+
+WINDOWS
+  1. Si no tenés Python: descargalo de https://www.python.org/downloads/
+     Al instalar, tildá "Add python.exe to PATH" y dejá tildado "tcl/tk and
+     IDLE" (viene tildado por defecto).
+  2. Descomprimí el kit en una carpeta cualquiera.
+  3. Doble clic en COMPILAR_WINDOWS.bat. Tarda uno o dos minutos y necesita
+     internet la primera vez.
+  4. Queda MonoPoly.exe en la misma carpeta. Es autónomo: lo podés copiar a
+     donde quieras o pasárselo a otros, sin que tengan Python.
+
+MAC
+  1. Instalá Python desde https://www.python.org/downloads/macos/
+     (el python3 que trae macOS no sirve: usa una versión de Tk muy vieja).
+  2. Descomprimí el kit en una carpeta cualquiera.
+  3. Clic derecho en COMPILAR_MAC.command > Abrir > Abrir.
+     Si macOS no lo deja: abrí la Terminal, escribí  bash  y un espacio,
+     arrastrá COMPILAR_MAC.command a la ventana de la Terminal y dale Enter.
+  4. Queda MonoPoly.app en la misma carpeta. Movela a Aplicaciones si querés.
+     Para pasársela a otro, comprimila en .zip.
+
+Si la compilación falla, el script muestra el error: copialo y mandalo.
+
+
+------------------------------------------------------------------------------
+CÓMO SE USA
+------------------------------------------------------------------------------
+CARGAR ARCHIVOS
+  "+ Archivos" o "+ Carpeta" (incluye las subcarpetas). También se puede
+  arrastrar a la ventana o sobre el ícono de la app.
+  Si seleccionás archivos en la lista, las acciones se aplican solo a esos.
+  Sin selección, se aplican a toda la lista.
+
+UNIR -> POLY
+  Agrupa los monos que se corresponden según los criterios tildados:
+    - Nombre:   mismo nombre salvo la última parte
+                (ZOOM0018_Tr1, ZOOM0018_Tr2... van juntos)
+    - Timecode: mismo TC de inicio
+    - Duración: misma cantidad de samples
+    - Entre carpetas: permite unir monos guardados en carpetas distintas
+                (ej. un grabador que guarda cada canal en Tr1/, Tr2/...).
+                Exige tildar también Timecode, para no mezclar tomas de
+                días distintos. El poly queda en la carpeta común.
+  El poly se nombra con la base y los tracks que lleva adentro:
+    ZOOM0018_Tr1 + Tr2        -> ZOOM0018_1-2.wav
+    ZOOM0018_Tr3 + Tr4        -> ZOOM0018_3-4.wav
+    ZOOM0018_Tr1 + Tr2 + Tr3  -> ZOOM0018_1-2-3.wav
+  El número de cada track sale, en este orden: del número de canal que
+  guarda el grabador en el iXML; del número al final del nombre (Tr3, A03,
+  _3); del número de la carpeta (Tr3/); y si no hay números, del texto
+  (ESC5_Boom + ESC5_Lav -> ESC5_Boom-Lav.wav).
+  Para unir solo algunos tracks, seleccionalos en la lista antes de "Unir".
+  Antes de escribir nada muestra los grupos: en verde los que se unen, en
+  rojo los que no y por qué, y aparte los monos que no encontraron pareja.
+  Para unir, el sample rate, los bits, la duración y el TC tienen que
+  coincidir exacto. Nunca se rellena, se recorta ni se convierte nada.
+
+SEPARAR -> MONOS
+  Separa cada poly en un mono por canal. Si el poly trae nombres de track
+  (en el iXML del grabador), cada mono lleva el número y el nombre:
+    ZOOM0018.wav  ->  ZOOM0018_Tr1_Boom.wav
+                      ZOOM0018_Tr2_Posadas.wav
+                      ZOOM0018_Tr3_Hernandez.wav
+                      ZOOM0018_Tr4.wav        (track sin nombre: solo Tr + número)
+  El número es el canal que anotó el grabador. Con la opción "Al separar,
+  nombrar por" se puede elegir también solo Tr + número o solo el nombre.
+  Antes de separar muestra un ejemplo de cómo van a quedar los nombres.
+  Si después se vuelven a unir esos monos, MonoPoly los reconoce como del
+  mismo grupo (ZOOM0018_1-2-3-4.wav) y conserva los nombres de track.
+
+EDITAR METADATA
+  Seleccioná uno o varios archivos y editá los campos de abajo:
+  Escena, Toma, Circulado, Wild track, Proyecto, Tape, UBits, Notas,
+  Frame rate y nombres de track (doble clic en el nombre).
+  - Con varios archivos seleccionados, solo se cambian los campos que
+    tocás; los que muestran ‹varios› quedan como estaban en cada archivo.
+  - TC de inicio: está bloqueado ("Preservar TC inicio"). Destildalo solo
+    si sabés lo que hacés: cambiar el TC mueve el audio en la línea de
+    tiempo y puede romper la sincro. Solo se edita de a un archivo.
+  - Frame rate: le dice a Avid, Premiere o Resolve cómo leer el TC. No
+    cambia la velocidad ni el audio.
+  - "Guardar copia con cambios" escribe SIEMPRE un archivo nuevo, según la
+    opción "Salida":
+      Subcarpeta     -> subcarpeta META junto al original, mismo nombre.
+      Misma carpeta  -> junto al original, con "_meta" al final del nombre.
+      Otra...        -> en la carpeta elegida, mismo nombre.
+    El original nunca se toca.
+  Se escribe en el iXML (lo que leen los programas de edición), tocando solo
+  los campos de primer nivel: los bloques propios de cada fabricante
+  (historial, Steinberg, etc.) quedan intactos aunque tengan campos con el
+  mismo nombre. Se respeta la codificación de texto que traiga el archivo. Si el bext
+  trae líneas estilo Sound Devices (sSCENE=, sTAKE=, sTRK1=...), también se
+  actualizan, para que no queden dos valores distintos.
+
+SALIDA
+  Por defecto los archivos nuevos van a una subcarpeta junto a los
+  originales: POLY (al unir), MONO (al separar) o META (al editar).
+  La app nunca pisa un archivo de origen. Si un archivo de salida ya
+  existe, pregunta antes de reemplazarlo.
+
+FPS PARA MOSTRAR
+  Algunos grabadores (por ejemplo los Zoom) no guardan el frame rate. En
+  ese caso la tabla muestra el TC con el FPS elegido arriba a la derecha y
+  lo marca con un asterisco (*). Ese selector es solo visual: para grabarlo
+  en el archivo, usá "Frame rate" en el panel de metadata.
+
+
+------------------------------------------------------------------------------
+QUÉ CAMBIA Y QUÉ NO
+------------------------------------------------------------------------------
+  Nunca cambia:  las muestras de audio, el sample rate, los bits, la
+                 duración y el TC (salvo que lo edites a propósito).
+  Se conserva:   el bext (fecha, originator, coding history), el iXML y
+                 cualquier otro chunk, tal cual y en el mismo orden.
+  Se actualiza:  al unir o separar, la cantidad de canales del header y la
+                 lista de tracks del iXML. Al editar, solo los campos que
+                 cambiaste.
+  Archivos de más de 4 GB: se escriben en formato RF64 automáticamente.
+  Un archivo RF64 o BW64 sigue siendo RF64 o BW64, aunque pese menos.
+  Chunks repetidos (por ejemplo varios LIST) se conservan todos, en orden.
+  Posición de canales (channel mask): si los monos declaran posiciones
+  distintas (ej. L y R de un estéreo), el poly las conserva; en el sonido
+  de rodaje (canales sin posición) queda "sin asignar", que es lo correcto.
+  El timecode se calcula con aritmética exacta (sin redondeos), en todos
+  los frame rates, incluidos 23.976 y 29.97 drop-frame.
+
+
+------------------------------------------------------------------------------
+PROBLEMAS FRECUENTES
+------------------------------------------------------------------------------
+  "No encuentro Python con tkinter" al compilar
+      Reinstalá Python desde python.org con la opción "tcl/tk" tildada
+      (Windows) o con el instalador oficial (Mac).
+
+  Un grupo dice "NO SE UNE"
+      Algún mono tiene distinta duración, TC, sample rate o bits. La app
+      lo dice en el detalle. Es a propósito: unirlos alteraría el audio.
+
+  Archivos con el iXML defectuoso de fábrica
+      Algunos grabadores escriben un iXML con errores (un "&" suelto,
+      caracteres raros). MonoPoly igual los une, separa y edita, y deja
+      ese defecto como venía: no lo arregla ni lo empeora.
+
+  No puedo arrastrar archivos
+      El arrastrar y soltar es opcional y depende de una librería que a
+      veces no se instala. Usá "+ Archivos" o "+ Carpeta".
+
+  Las letras se ven muy chicas o muy grandes
+      Avisá con una captura de pantalla para ajustarlo.
